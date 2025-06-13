@@ -3,24 +3,36 @@ from bs4 import BeautifulSoup
 import time
 from datetime import datetime
 # from tkinter import *
-import hashlib
-import smtplib
+
 
 # window = Tk()
 # window.title("Pokemon Monitor")
 Black_Bolt_ETB = "https://www.target.com/p/pok-233-mon-scarlet-violet-s10-5-elite-trainer-box-2-trading-cards/-/A-94636862?clkid=8985bc2eN40d511f0a9549f724edc96ad&cpng=&lnm=81938&afid=Mavely&ref=tgt_adv_xasd0002"
 Black_Bolt_Booster_Bundle = "https://www.target.com/p/pok-233-mon-scarlet-violet-s10-5-booster-bundle-box-trading-cards/-/A-94681770?clkid=8985bc2eN40d511f0a9549f724edc96ad&cpng=&lnm=81938&afid=Mavely&ref=tgt_adv_xasd0002"
 Destined_Rivals_ETB = "https://www.target.com/p/pok-233-mon-trading-card-game-scarlet-38-violet-8212-destined-rivals-elite-trainer-box/-/A-94300069?clkid=8985bc2eN40d511f0a9549f724edc96ad&cpng=&lnm=81938&afid=Mavely&ref=tgt_adv_xasd0002"
-FF = "https://www.target.com/p/magic-the-gathering-final-fantasy-commander-deck-2-trading-cards/-/A-94641038?clkid=8985bc2eN40d511f0a9549f724edc96ad&cpng=&lnm=81938&afid=Mavely&ref=tgt_adv_xasd0002"
-CHECK_INTERVAL = 0.2
+FF = "https://www.target.com/p/magic-the-gathering-final-fantasy-bundle-bl-trading-cards/-/A-94641041?clkid=8985bc2eN40d511f0a9549f724edc96ad&cpng=&lnm=81938&afid=Mavely&ref=tgt_adv_xasd0002"
+CHECK_INTERVAL = 0.01
+
+tag = "div"
+id = "above-the-fold-information"
+inStockMsg = "in stock!"
 
 
-def get_monitored_content():
-    response = requests.get(Destined_Rivals_ETB)
+
+def get_monitored_content(URL, tag, id):
+    #Connects to a website/server via the URL you provide
+    #Requests data (like HTML, JSON, etc.) from that page
+    #Returns a Response object, which contains the server's response (such as the page content, status code, headers, etc.).
+    response = requests.get(URL)
+
+    #parses the HTML content from the response.text using BeautifulSoup, turning it into a structured object you can easily navigate and search.
+    #response.text: The raw HTML text returned from the website (via requests.get()).
+    #'html.parser': Tells BeautifulSoup to use Python’s built-in HTML parser to interpret the page
     soup = BeautifulSoup(response.text, 'html.parser')
-    # Target the specific element (e.g., a div with id="price")
+
+    #Target the specific element (e.g., a div with id="price")
     #Targeting Destined_Rivals_ETB notify me button
-    element = soup.find("button", id="notifyMe")
+    element = soup.find(str(tag), id=id)
 
     if element:
         return element.get_text(strip=True)
@@ -28,14 +40,14 @@ def get_monitored_content():
         return None  # Handle missing element gracefully
     
 
-last_content = get_monitored_content()
+last_content = get_monitored_content(FF, tag=tag, id=id)
 
 while True:
     time.sleep(CHECK_INTERVAL)
-    current_content = get_monitored_content()
+    current_content = get_monitored_content(FF, tag=tag, id=id)
 
     if current_content != last_content:
-        print(f"{datetime.now()} [Change Detected] Old: {last_content} → New: {current_content}")
+        print(f"{datetime.now()}: {inStockMsg}")
         last_content = current_content
     else:
-        print(f"{datetime.now()} ...")
+        continue
