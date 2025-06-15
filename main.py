@@ -67,5 +67,3 @@ while True:
         last_content = current_content
     else:
         continue
-
-    
